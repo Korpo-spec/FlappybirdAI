@@ -29,7 +29,12 @@ public class BirdMovement : MonoBehaviour
         if (collision.gameObject.tag == "Collumn")
         {
             Destroy(this.gameObject);
-
+            GameObject[] pillars = GameObject.FindGameObjectsWithTag("CollumPair");
+            foreach (GameObject pillar in pillars)
+            {
+                Destroy(pillar);
+            }
+            
         }
     }
 
