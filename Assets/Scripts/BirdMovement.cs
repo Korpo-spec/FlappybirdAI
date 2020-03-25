@@ -7,6 +7,7 @@ public class BirdMovement : MonoBehaviour
     private Rigidbody2D rb2d;
     public float flapforce;
     private int points = 0;
+    public Animator anim;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +22,7 @@ public class BirdMovement : MonoBehaviour
             rb2d.velocity = Vector2.zero;
 
             rb2d.AddForce(new Vector2(0, flapforce));
+            anim.Play("Flap");
         }
     }
 
@@ -48,5 +50,12 @@ public class BirdMovement : MonoBehaviour
             Debug.Log(points);
             textUI.GetComponent<UnityEngine.UI.Text>().text = points.ToString();
         }
+    }
+
+    private void NeuralNetwork()
+    {
+
+
+
     }
 }
