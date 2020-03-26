@@ -17,7 +17,7 @@ public class BirdRotation : MonoBehaviour
         {
             if (transform.rotation.z > -0.5)
             {
-                Debug.Log(transform.rotation.z);
+                
                 transform.Rotate(Vector3.back, 90 * Time.deltaTime);
                 
             }
@@ -26,7 +26,7 @@ public class BirdRotation : MonoBehaviour
         else if (rbParent.velocity.y > 0)
         {
             
-            Debug.Log("Rotate");
+            
             // Dampen towards the target rotation
             transform.rotation = Quaternion.Euler(0, 0, 25f);
             

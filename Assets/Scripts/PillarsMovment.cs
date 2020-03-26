@@ -5,10 +5,11 @@ using UnityEngine;
 public class PillarsMovment : MonoBehaviour
 {
     public float movespeed;
+    private GameObject gameMaster;
     // Start is called before the first frame update
     void Start()
     {
-        
+        gameMaster = GameObject.Find("GameMaster");
     }
 
     // Update is called once per frame
@@ -22,6 +23,11 @@ public class PillarsMovment : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+        //if (transform.position.x < -3.6f)
+        //{
+        //    gameMaster.GetComponent<SpawnPillars>().RemoveFirst();
+        //    Debug.Log("trying to remove");
+        //}
     }
 
     
