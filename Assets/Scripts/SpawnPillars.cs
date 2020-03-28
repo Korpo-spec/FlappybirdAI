@@ -9,6 +9,8 @@ public class SpawnPillars : MonoBehaviour
     public static GameControl instance;
     public List<GameObject> pillarsList = new List<GameObject>();
     private List<GameObject> birdList = new List<GameObject>();
+    private List<GameObject> deadBirds = new List<GameObject>();
+    private GameObject bestOfPastGeneration;
     public GameObject bird;
     public int birdsPerGeneration;
 
@@ -48,11 +50,21 @@ public class SpawnPillars : MonoBehaviour
             
             time = 0;
         }
+        Debug.Log(birdList.Count);
     }
 
+
+    private float[][][] weightsOfBest;
+    private float[][] biasesOfBest;
     public void SpawnNewBird(GameObject deadBird)
     {
-
+        if (birdList.Count == 1)
+        {
+            bestOfPastGeneration = deadBird;
+            weightsOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().weights;
+            biasesOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().biases;
+            Debug.Log("best of gen");
+        }
         birdList.Remove(deadBird);
     }
     
@@ -85,5 +97,20 @@ public class SpawnPillars : MonoBehaviour
             return this.transform;
         }
         
+    }
+
+    public (float[][][] weight,float[][] bias, bool pastGenExists) GetWeightsBiases()
+    {
+        if (weightsOfBest == null)
+        {
+            
+            return (null, null , false);
+            
+        }
+        else
+        {
+            return (weightsOfBest, biasesOfBest, true);
+        }
+       
     }
 }

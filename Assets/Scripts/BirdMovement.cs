@@ -39,8 +39,8 @@ public class BirdMovement : MonoBehaviour
         //Debug.Log(deltaY + "deltaY");
         float[] inputsss = { deltaX, deltaY, rb2d.velocity.y};
         float[] output = FeedForward(inputsss);
-        Debug.Log(output[0]);
-        Debug.Log(output[1]);
+        //Debug.Log(output[0]);
+        //Debug.Log(output[1]);
 
         if (output[0] > output[1])
         {
@@ -93,8 +93,8 @@ public class BirdMovement : MonoBehaviour
 
     private int[] layers;//layers    
     private float[][] neurons;//neurons    
-    private float[][] biases;//biasses    
-    private float[][][] weights;//weights    
+    public float[][] biases;//biasses    
+    public float[][][] weights;//weights    
     private int[] activations;//layers
     public void NeuralNetwork(int[] layers)
     {
@@ -107,7 +107,14 @@ public class BirdMovement : MonoBehaviour
         InitNeurons();
         InitBiases();
         InitWeights();
-
+        var result = sp.GetWeightsBiases();
+        if (result.pastGenExists)
+        {
+            biases = result.bias;
+            weights = result.weight;
+            Debug.Log("setting bias");
+        }
+        
 
     }
 
