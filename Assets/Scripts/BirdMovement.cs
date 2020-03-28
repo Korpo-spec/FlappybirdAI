@@ -66,29 +66,27 @@ public class BirdMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Collumn")
-        {
-            Destroy(this.gameObject);
-            GameObject[] pillars = GameObject.FindGameObjectsWithTag("CollumPair");
-            foreach (GameObject pillar in pillars)
-            {
-                Destroy(pillar);
-            }
-            points = 0;
-            sp.SpawnNewBird();
-        }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if (collision.gameObject.tag == "Collumn")
+        {
+            Destroy(this.gameObject);
+
+            points = 0;
+            sp.SpawnNewBird(this.gameObject);
+        }
         if (collision.gameObject.tag == "PointsArea")
         {
             GameObject textUI = GameObject.Find("Text");
             
             points += 1;
-            Debug.Log(points);
+            
             textUI.GetComponent<UnityEngine.UI.Text>().text = points.ToString();
-            sp.RemoveFirst();
+            
         }
     }
 

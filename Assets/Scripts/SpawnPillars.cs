@@ -8,17 +8,36 @@ public class SpawnPillars : MonoBehaviour
     public float spawnrate;
     public static GameControl instance;
     public List<GameObject> pillarsList = new List<GameObject>();
+    private List<GameObject> birdList = new List<GameObject>();
     public GameObject bird;
+    public int birdsPerGeneration;
 
     private float time = 0;
 
     private void Start()
     {
         time = spawnrate + 1;
-        Instantiate(bird);
+        //Instantiate(bird);
     }
     void Update()
     {
+
+        if (birdList.Count == 0)
+        {
+            pillarsList.Clear();
+            GameObject[] pillars = GameObject.FindGameObjectsWithTag("CollumPair");
+            foreach (GameObject pillar in pillars)
+            {
+                Destroy(pillar);
+            }
+
+            for (int i = 0; i < birdsPerGeneration; i++)
+            {
+                GameObject newBird = (GameObject)Instantiate(bird);
+                birdList.Add(newBird);
+            }
+        }
+
         time += Time.deltaTime;
         if (time > spawnrate)
         {
@@ -31,9 +50,10 @@ public class SpawnPillars : MonoBehaviour
         }
     }
 
-    public void SpawnNewBird()
+    public void SpawnNewBird(GameObject deadBird)
     {
-        Instantiate(bird);
+
+        birdList.Remove(deadBird);
     }
     
     public void RemoveFirst()

@@ -23,11 +23,11 @@ public class PillarsMovment : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        //if (transform.position.x < -3.6f)
-        //{
-        //    gameMaster.GetComponent<SpawnPillars>().RemoveFirst();
-        //    Debug.Log("trying to remove");
-        //}
+        if (transform.position.x < -3.6f)
+        {
+            gameMaster.GetComponent<SpawnPillars>().RemoveFirst();
+            
+        }
     }
 
     
