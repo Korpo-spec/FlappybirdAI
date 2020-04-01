@@ -56,14 +56,20 @@ public class SpawnPillars : MonoBehaviour
 
     private float[][][] weightsOfBest;
     private float[][] biasesOfBest;
+    private int bestPointOfAllGen = 0;
     public void SpawnNewBird(GameObject deadBird)
     {
         if (birdList.Count == 1)
         {
             bestOfPastGeneration = deadBird;
-            weightsOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().weights;
-            biasesOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().biases;
-            Debug.Log("best of gen");
+            int bestPointOfPastGeneration = bestOfPastGeneration.GetComponent<BirdMovement>().points;
+            if (bestPointOfPastGeneration > bestPointOfAllGen)
+            {
+                bestPointOfAllGen = bestPointOfPastGeneration;
+                weightsOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().weights;
+                biasesOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().biases;
+            }
+            
         }
         birdList.Remove(deadBird);
     }

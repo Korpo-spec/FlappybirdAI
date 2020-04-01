@@ -7,7 +7,7 @@ public class BirdMovement : MonoBehaviour
 {
     private Rigidbody2D rb2d;
     public float flapforce;
-    private int points = 0;
+    public int points = 0;
     public Animator anim;
     public GameObject pillarListGameObject;
     
@@ -64,20 +64,14 @@ public class BirdMovement : MonoBehaviour
         anim.Play("Flap");
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
         if (collision.gameObject.tag == "Collumn")
         {
-            Destroy(this.gameObject);
-
-            points = 0;
             sp.SpawnNewBird(this.gameObject);
+            points = 0;
+            Destroy(this.gameObject);
         }
         if (collision.gameObject.tag == "PointsArea")
         {
@@ -94,8 +88,11 @@ public class BirdMovement : MonoBehaviour
     private int[] layers;//layers    
     private float[][] neurons;//neurons    
     public float[][] biases;//biasses    
-    public float[][][] weights;//weights    
-    private int[] activations;//layers
+    public float[][][] weights;//weights  
+    
+    public int chanceOfMutation;
+    public float mutationValue;
+    
     public void NeuralNetwork(int[] layers)
     {
 
@@ -113,9 +110,39 @@ public class BirdMovement : MonoBehaviour
             biases = result.bias;
             weights = result.weight;
             Debug.Log("setting bias");
+            Mutate();
         }
         
 
+    }
+
+    private void Mutate()
+    {
+        Debug.Log("mutating");
+        for (int x = 0; x < weights.Length; x++)
+        {
+            for (int y = 0; y < weights[x].Length; y++)
+            {
+                for (int z = 0; z < weights[x][y].Length; z++)
+                {
+                    if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
+                    {
+                        weights[x][y][z] += UnityEngine.Random.Range(-mutationValue, mutationValue);
+                    }
+                }
+            }
+        }
+
+        for (int x = 0; x < biases.Length; x++)
+        {
+            for (int y = 0; y < biases[x].Length; y++)
+            {
+                if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
+                {
+                    biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);
+                }
+            }
+        }
     }
 
     private void InitNeurons()
