@@ -44,13 +44,13 @@ public class SpawnPillars : MonoBehaviour
         if (time > spawnrate)
         {
             Transform positionPillar = this.transform;
-            GameObject newGO = (GameObject)Instantiate(pillars, new Vector3(15, Random.Range(-2, 4), 1), Quaternion.identity);
+            GameObject newGO = (GameObject)Instantiate(pillars, new Vector3(10, Random.Range(-2, 4), 1), Quaternion.identity);
             pillarsList.Add(newGO);
             Debug.Log(pillarsList.Count);
             
             time = 0;
         }
-        Debug.Log(birdList.Count);
+        
     }
 
 

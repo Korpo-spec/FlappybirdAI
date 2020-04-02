@@ -109,16 +109,16 @@ public class BirdMovement : MonoBehaviour
         {
             biases = result.bias;
             weights = result.weight;
-            Debug.Log("setting bias");
+            
             Mutate();
         }
         
 
     }
-
+    
     private void Mutate()
     {
-        Debug.Log("mutating");
+        
         for (int x = 0; x < weights.Length; x++)
         {
             for (int y = 0; y < weights[x].Length; y++)
@@ -127,8 +127,14 @@ public class BirdMovement : MonoBehaviour
                 {
                     if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
                     {
-                        weights[x][y][z] += UnityEngine.Random.Range(-mutationValue, mutationValue);
+                        float randomNumber = UnityEngine.Random.Range(-mutationValue, mutationValue);
+                        
+                        weights[x][y][z] += randomNumber;
+                        Debug.Log("körs");
+                        Debug.Break();
+
                     }
+                   
                 }
             }
         }
@@ -141,8 +147,11 @@ public class BirdMovement : MonoBehaviour
                 {
                     biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);
                 }
+                
             }
         }
+
+
     }
 
     private void InitNeurons()
