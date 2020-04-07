@@ -22,7 +22,7 @@ public class BirdMovement : MonoBehaviour
         pillarListGameObject = GameObject.Find("GameMaster");
         sp = pillarListGameObject.GetComponent<SpawnPillars>();
         rb2d = GetComponent<Rigidbody2D>();
-        int[] layers = { 3, 2, 2 };
+        int[] layers = { 2, 2, 2 };
         NeuralNetwork(layers);
         
     }
@@ -37,7 +37,7 @@ public class BirdMovement : MonoBehaviour
 
         //Debug.Log(deltaX + "deltaX");
         //Debug.Log(deltaY + "deltaY");
-        float[] inputsss = { deltaX, deltaY, rb2d.velocity.y};
+        float[] inputsss = { deltaX, deltaY};
         float[] output = FeedForward(inputsss);
         //Debug.Log(output[0]);
         //Debug.Log(output[1]);
@@ -107,18 +107,47 @@ public class BirdMovement : MonoBehaviour
         var result = sp.GetWeightsBiases();
         if (result.pastGenExists)
         {
-            biases = result.bias;
-            weights = result.weight;
+            for (int x = 0; x < biases.Length; x++)
+            {
+                for (int y = 0; y < biases[x].Length; y++)
+                {
+                    biases[x][y] = result.bias[x][y];
+                }
+            }
+            //biases = result.bias;
+            for (int x = 0; x < weights.Length; x++)
+            {
+                for (int y = 0; y < weights[x].Length; y++)
+                {
+                    for (int z = 0; z < weights[x][y].Length; z++)
+                    {
+                        weights[x][y][z] = result.weight[x][y][z];
+                    }
+                }
+            }
+            //weights = result.weight;
             
             Mutate();
         }
         
 
     }
-    
+    bool firstTime = true;
     private void Mutate()
     {
-        
+
+        for (int x = 0; x < biases.Length; x++)
+        {
+            for (int y = 0; y < biases[x].Length; y++)
+            {
+                if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
+                {
+                    biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);
+                }
+
+            }
+        }
+
         for (int x = 0; x < weights.Length; x++)
         {
             for (int y = 0; y < weights[x].Length; y++)
@@ -130,8 +159,12 @@ public class BirdMovement : MonoBehaviour
                         float randomNumber = UnityEngine.Random.Range(-mutationValue, mutationValue);
                         
                         weights[x][y][z] += randomNumber;
-                        Debug.Log("körs");
-                        Debug.Break();
+                        
+                        if (firstTime)
+                        {
+                            firstTime = !firstTime;
+                            Debug.Log("weight" + weights[x][y][z]);
+                        }
 
                     }
                    
@@ -139,17 +172,7 @@ public class BirdMovement : MonoBehaviour
             }
         }
 
-        for (int x = 0; x < biases.Length; x++)
-        {
-            for (int y = 0; y < biases[x].Length; y++)
-            {
-                if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
-                {
-                    biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);
-                }
-                
-            }
-        }
+        
 
 
     }
