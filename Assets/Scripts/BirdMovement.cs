@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class BirdMovement : MonoBehaviour
 {
     private Rigidbody2D rb2d;
@@ -14,7 +15,7 @@ public class BirdMovement : MonoBehaviour
     private float deltaX;
     private float deltaY;
     private SpawnPillars sp;
-    
+
     
     // Start is called before the first frame update
     void Start()
@@ -24,38 +25,43 @@ public class BirdMovement : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         int[] layers = { 2, 2, 2 };
         NeuralNetwork(layers);
+
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        Transform pillarTrans = sp.GetTransform();
-        deltaX = pillarTrans.position.x - transform.position.x;
 
-        deltaY = pillarTrans.position.y - transform.position.y;
-
-        //Debug.Log(deltaX + "deltaX");
-        //Debug.Log(deltaY + "deltaY");
-        float[] inputsss = { deltaX, deltaY};
-        float[] output = FeedForward(inputsss);
-        //Debug.Log(output[0]);
-        //Debug.Log(output[1]);
-
-        if (output[0] > output[1])
+        if (sp.isAIOn)
         {
-            Flap();
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            rb2d.velocity = Vector2.zero;
+            Transform pillarTrans = sp.GetTransform();
+            deltaX = pillarTrans.position.x - transform.position.x;
+            deltaY = pillarTrans.position.y - transform.position.y;
 
-            rb2d.AddForce(new Vector2(0, flapforce));
-            anim.Play("Flap");
+            float[] inputsss = { deltaX, deltaY };
+            float[] output = FeedForward(inputsss);
+
+
+            if (output[0] > output[1])
+            {
+                Flap();
+            }
         }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Flap();
+            }
+        }
+        
+        
         
     }
 
+    
+    
     private void Flap()
     {
         rb2d.velocity = Vector2.zero;
@@ -160,11 +166,7 @@ public class BirdMovement : MonoBehaviour
                         
                         weights[x][y][z] += randomNumber;
                         
-                        if (firstTime)
-                        {
-                            firstTime = !firstTime;
-                            Debug.Log("weight" + weights[x][y][z]);
-                        }
+                        
 
                     }
                    

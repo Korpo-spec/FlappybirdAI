@@ -1,25 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpawnPillars : MonoBehaviour
 {
     public GameObject pillars;
     public float spawnrate;
     public static GameControl instance;
+
+
     public List<GameObject> pillarsList = new List<GameObject>();
     private List<GameObject> birdList = new List<GameObject>();
-    private List<GameObject> deadBirds = new List<GameObject>();
+    
+
+
     private GameObject bestOfPastGeneration;
     public GameObject bird;
     public int birdsPerGeneration;
 
     private float time = 0;
 
+    public Button btn;
     private void Start()
     {
         time = spawnrate + 1;
-        //Instantiate(bird);
+        
+        btn.onClick.AddListener(AiOnOff);
+
     }
     void Update()
     {
@@ -32,12 +40,20 @@ public class SpawnPillars : MonoBehaviour
             {
                 Destroy(pillar);
             }
-
-            for (int i = 0; i < birdsPerGeneration; i++)
+            if (isAIOn)
+            {
+                for (int i = 0; i < birdsPerGeneration; i++)
+                {
+                    GameObject newBird = (GameObject)Instantiate(bird);
+                    birdList.Add(newBird);
+                }
+            }
+            else
             {
                 GameObject newBird = (GameObject)Instantiate(bird);
                 birdList.Add(newBird);
             }
+            
         }
 
         time += Time.deltaTime;
@@ -51,6 +67,39 @@ public class SpawnPillars : MonoBehaviour
             time = 0;
         }
         
+    }
+    private bool isOn = false;
+    public bool isAIOn {
+        get
+        {
+            return isOn;
+        }
+    }
+    
+    private void AiOnOff()
+    {
+        isOn = !isOn;//ändrar isOn till det motsatta av isOn alltså om den e true blir den false
+
+        if (isOn)//byter färg på knappen beroende på om AI är på eller inte
+        {
+            var colors = btn.colors;
+            colors.pressedColor = Color.green;
+            colors.normalColor = Color.green;
+            colors.selectedColor = Color.green;
+            btn.colors = colors;
+        }
+        else
+        {
+            var colors = btn.colors;
+            colors.pressedColor = Color.red;
+            colors.normalColor = Color.red;
+            colors.selectedColor = Color.red;
+            btn.colors = colors;
+        }
+        
+
+        
+      
     }
 
 
