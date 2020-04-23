@@ -9,22 +9,22 @@ public class BirdMovement : MonoBehaviour
     private Rigidbody2D rb2d;
     public float flapforce;
     public int points = 0;
-    public Animator anim;
+    public Animator anim;//animator objektet
     public GameObject pillarListGameObject;
     
     private float deltaX;
     private float deltaY;
-    private SpawnPillars sp;
+    private SpawnPillars spawnPillarsScript;
 
     
     // Start is called before the first frame update
     void Start()
     {
-        pillarListGameObject = GameObject.Find("GameMaster");
-        sp = pillarListGameObject.GetComponent<SpawnPillars>();
-        rb2d = GetComponent<Rigidbody2D>();
-        int[] layers = { 2, 2, 2 };
-        NeuralNetwork(layers);
+        pillarListGameObject = GameObject.Find("GameMaster");//hämta in GameMaster objektet
+        spawnPillarsScript = pillarListGameObject.GetComponent<SpawnPillars>();//get spawnpillars scriptet
+        rb2d = GetComponent<Rigidbody2D>();// hämta ridgidbody 2D på fågeln
+        int[] layers = { 2, 2, 2 };//Hur många lager med hur många neutroner som finns i nätverket
+        NeuralNetwork(layers);//Set up för neural network
 
         
     }
@@ -33,24 +33,24 @@ public class BirdMovement : MonoBehaviour
     void Update()
     {
 
-        if (sp.isAIOn)
+        if (spawnPillarsScript.isAIOn)//kollar om AI är på
         {
-            Transform pillarTrans = sp.GetTransform();
-            deltaX = pillarTrans.position.x - transform.position.x;
-            deltaY = pillarTrans.position.y - transform.position.y;
+            Transform pillarTrans = spawnPillarsScript.GetTransform();//hämta transform från den första/närmsta pelaren
+            deltaX = pillarTrans.position.x - transform.position.x;// tar fram deltaX
+            deltaY = pillarTrans.position.y - transform.position.y;// tar fram deltaY
 
-            float[] inputsss = { deltaX, deltaY };
-            float[] output = FeedForward(inputsss);
+            float[] inputs = { deltaX, deltaY };// skapar inputs och inputar till "hjärnan"
+            float[] output = ActivateNeurons(inputs);// activerar hjärnan
 
 
-            if (output[0] > output[1])
+            if (output[0] > output[1])// kollar om vi ska flap eller inte
             {
                 Flap();
             }
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))// om Ai är av kolla om man klickar space
             {
                 Flap();
             }
@@ -64,22 +64,22 @@ public class BirdMovement : MonoBehaviour
     
     private void Flap()
     {
-        rb2d.velocity = Vector2.zero;
+        rb2d.velocity = Vector2.zero;// sätt velocity till 0
 
-        rb2d.AddForce(new Vector2(0, flapforce));
-        anim.Play("Flap");
+        rb2d.AddForce(new Vector2(0, flapforce));// lägg till en force upp (flapforce)
+        anim.Play("Flap");//spela flap animationen
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)// när fågeln colliderar
     {
 
-        if (collision.gameObject.tag == "Collumn")
+        if (collision.gameObject.tag == "Collumn")// om det är en collumn ta bort objectet och evaluate bird för att se vilken som är bäst
         {
-            sp.SpawnNewBird(this.gameObject);
+            spawnPillarsScript.EvaluateBird(this.gameObject);
             points = 0;
             Destroy(this.gameObject);
         }
-        if (collision.gameObject.tag == "PointsArea")
+        if (collision.gameObject.tag == "PointsArea")// om det är points area som den colliderar med så ändras points texten
         {
             GameObject textUI = GameObject.Find("Text");
             
@@ -99,18 +99,18 @@ public class BirdMovement : MonoBehaviour
     public int chanceOfMutation;
     public float mutationValue;
     
-    public void NeuralNetwork(int[] layers)
+    public void NeuralNetwork(int[] layers)//Initierar neuralnetwork
     {
 
         this.layers = new int[layers.Length];
-        for (int i = 0; i < layers.Length; i++)
+        for (int i = 0; i < layers.Length; i++)//skapar antalet lager
         {
             this.layers[i] = layers[i];
         }
         InitNeurons();
         InitBiases();
         InitWeights();
-        var result = sp.GetWeightsBiases();
+        var result = spawnPillarsScript.GetWeightsBiases();
         if (result.pastGenExists)
         {
             for (int x = 0; x < biases.Length; x++)
@@ -146,9 +146,9 @@ public class BirdMovement : MonoBehaviour
         {
             for (int y = 0; y < biases[x].Length; y++)
             {
-                if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
+                if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)//kollar om den biasen ska muteras
                 {
-                    biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);
+                    biases[x][y] += UnityEngine.Random.Range(-mutationValue, mutationValue);//randomizar med hur mycket den muterrar
                 }
 
             }
@@ -160,7 +160,7 @@ public class BirdMovement : MonoBehaviour
             {
                 for (int z = 0; z < weights[x][y].Length; z++)
                 {
-                    if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)
+                    if (UnityEngine.Random.Range(0f, 100f) <= chanceOfMutation)//gör samma som innan fast med weights
                     {
                         float randomNumber = UnityEngine.Random.Range(-mutationValue, mutationValue);
                         
@@ -181,10 +181,10 @@ public class BirdMovement : MonoBehaviour
 
     private void InitNeurons()
     {
-        List<float[]> neuronsList = new List<float[]>();
+        List<float[]> neuronsList = new List<float[]>();//skapa en neutron lista
         for (int i = 0; i < layers.Length; i++)
         {
-            neuronsList.Add(new float[layers[i]]);
+            neuronsList.Add(new float[layers[i]]);//lägger till antalet neuroner som ska finnas i lagret neuron 
         }
         neurons = neuronsList.ToArray();
     }
@@ -227,10 +227,10 @@ public class BirdMovement : MonoBehaviour
 
     public float activate(float value)
     {
-        return (float)Math.Tanh(value);
+        return (float)Math.Tanh(value);//En matematisk formel som jag inte kommer ihåg
     }
 
-    public float[] FeedForward(float[] inputs)
+    public float[] ActivateNeurons(float[] inputs)//hjärnan
     {
         for (int i = 0; i < inputs.Length; i++)
         {

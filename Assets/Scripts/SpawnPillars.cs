@@ -5,82 +5,81 @@ using UnityEngine.UI;
 
 public class SpawnPillars : MonoBehaviour
 {
-    public GameObject pillars;
+    public GameObject pillars;//prefab för pillars
+
     public float spawnrate;
-    public static GameControl instance;
 
-
-    public List<GameObject> pillarsList = new List<GameObject>();
-    private List<GameObject> birdList = new List<GameObject>();
     
 
 
-    private GameObject bestOfPastGeneration;
-    public GameObject bird;
-    public int birdsPerGeneration;
+    public List<GameObject> pillarsList = new List<GameObject>(); //Lista över alla pillars som finns i scenen
+    private List<GameObject> birdList = new List<GameObject>(); //Lista över alla levande fåglar
+    
+
+
+    private GameObject bestOfPastGeneration; //Den fågel som var bäst i förra generationen
+    
+    public GameObject bird; //bird prefab
+    
+    public int birdsPerGeneration;//Antalet birds som ska spawnas varje runda
 
     private float time = 0;
 
-    public Button btn;
+    public Button btn;//tar in knappen
     private void Start()
     {
-        time = spawnrate + 1;
+        time = spawnrate + 1; // gör så att pillars spawnar direkt
         
-        btn.onClick.AddListener(AiOnOff);
+        btn.onClick.AddListener(AiOnOff);//länkar knappen till metoden som ska köras
 
     }
     void Update()
     {
 
-        if (birdList.Count == 0)
+        if (birdList.Count == 0) //om birdsList är tom ta bort alla pillars och spawna in en ny bird/många om AI är på
         {
             pillarsList.Clear();
-            GameObject[] pillars = GameObject.FindGameObjectsWithTag("CollumPair");
+            GameObject[] pillars = GameObject.FindGameObjectsWithTag("CollumPair");// tar in alla pillars
             foreach (GameObject pillar in pillars)
             {
-                Destroy(pillar);
+                Destroy(pillar);//försör alla pillars som hittades
             }
-            if (isAIOn)
+            if (isAIOn)//om AI är på spawna antalet birds som birdsPerGeneration vill
             {
                 for (int i = 0; i < birdsPerGeneration; i++)
                 {
                     GameObject newBird = (GameObject)Instantiate(bird);
-                    birdList.Add(newBird);
+                    birdList.Add(newBird);// lägg till birden i birdlist
                 }
             }
             else
             {
                 GameObject newBird = (GameObject)Instantiate(bird);
-                birdList.Add(newBird);
+                birdList.Add(newBird);// lägg till birden i birdlist
             }
             
         }
 
-        time += Time.deltaTime;
-        if (time > spawnrate)
+        time += Time.deltaTime;// ökar timern
+        if (time > spawnrate)//håller spawnraten
         {
-            Transform positionPillar = this.transform;
-            GameObject newGO = (GameObject)Instantiate(pillars, new Vector3(10, Random.Range(-2, 4), 1), Quaternion.identity);
-            pillarsList.Add(newGO);
-            Debug.Log(pillarsList.Count);
             
-            time = 0;
+            GameObject newGO = (GameObject)Instantiate(pillars, new Vector3(10, Random.Range(-2, 4), 1), Quaternion.identity);// spawnar en pillar med random höjd
+            pillarsList.Add(newGO);//lägger till pillar i pillarsList
+            
+            
+            time = 0;//säter timer till 0 så att spawnrate funkar
         }
         
     }
-    private bool isOn = false;
-    public bool isAIOn {
-        get
-        {
-            return isOn;
-        }
-    }
-    
+
+    public bool isAIOn { get; private set; } = false;// get set för isAIOn
+
     private void AiOnOff()
     {
-        isOn = !isOn;//ändrar isOn till det motsatta av isOn alltså om den e true blir den false
+        isAIOn = !isAIOn;//ändrar isOn till det motsatta av isOn alltså om den e true blir den false
 
-        if (isOn)//byter färg på knappen beroende på om AI är på eller inte
+        if (isAIOn)//byter färg på knappen beroende på om AI är på eller inte
         {
             var colors = btn.colors;
             colors.pressedColor = Color.green;
@@ -103,16 +102,17 @@ public class SpawnPillars : MonoBehaviour
     }
 
 
-    private float[][][] weightsOfBest;
-    private float[][] biasesOfBest;
-    private int bestPointOfAllGen = 0;
-    public void SpawnNewBird(GameObject deadBird)
+    private float[][][] weightsOfBest; 
+    private float[][] biasesOfBest; //weights och biases för de bästa fåglarna
+
+    private int bestPointOfAllGen = 0; 
+    public void EvaluateBird(GameObject deadBird)
     {
-        if (birdList.Count == 1)
+        if (birdList.Count == 1 && isAIOn)// om det är den sista fågeln och AI är på
         {
-            bestOfPastGeneration = deadBird;
-            int bestPointOfPastGeneration = bestOfPastGeneration.GetComponent<BirdMovement>().points;
-            if (bestPointOfPastGeneration > bestPointOfAllGen)
+            bestOfPastGeneration = deadBird; // den sista som dog blir bestOfPastGeneration
+            int bestPointOfPastGeneration = bestOfPastGeneration.GetComponent<BirdMovement>().points; //hämtar dess poäng
+            if (bestPointOfPastGeneration > bestPointOfAllGen) //om poängen e bättre än alla andra fåglar gör dessa fåglars biases och weights till de nya som används till arv
             {
                 bestPointOfAllGen = bestPointOfPastGeneration;
                 weightsOfBest = bestOfPastGeneration.GetComponent<BirdMovement>().weights;
@@ -120,14 +120,13 @@ public class SpawnPillars : MonoBehaviour
             }
             
         }
-        birdList.Remove(deadBird);
+        birdList.Remove(deadBird);// ta bort fågeln från listan
     }
     
-    public void RemoveFirst()
+    public void RemoveFirst()// metod för att försöka ta bort den första pelaren i listan
     {
         
-        Debug.Log(spawnrate);
-        Debug.Log(pillarsList.Count);
+        
         
         try
         {
@@ -140,7 +139,7 @@ public class SpawnPillars : MonoBehaviour
         }
         
     }
-    public Transform GetTransform()
+    public Transform GetTransform() // finns för att returna den närmaste pelarens transform
     {
         try
         {
@@ -154,7 +153,7 @@ public class SpawnPillars : MonoBehaviour
         
     }
 
-    public (float[][][] weight,float[][] bias, bool pastGenExists) GetWeightsBiases()
+    public (float[][][] weight,float[][] bias, bool pastGenExists) GetWeightsBiases()// metod för att returera de bästa weights och biases
     {
         if (weightsOfBest == null)
         {
